@@ -14,9 +14,9 @@ namespace Expences.Infraestrocture.Core
             Context = dbAppContext;
             Entity =  Context.Set<TEntity>();
         }
-        public virtual void Delete(TEntity entity)
+        public virtual void Delete(int id)
         {
-            Entity.Remove(entity);
+            Entity.Remove(Get(id));
             Context.SaveChanges();
         }
 

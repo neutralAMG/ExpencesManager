@@ -2,6 +2,8 @@
 using Expences.Infraestrocture.Context;
 using Expences.Infraestrocture.Core;
 using Expences.Infraestrocture.Interfaces;
+using Expences.Infraestrocture.Logger;
+using Expences.Infraestrocture.Logger.Loggers;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -9,28 +11,32 @@ namespace Expences.Infraestrocture.Repositories
 {
     public class ExpencesRepository : BaseRepository<Domain.Entities.Expences>, IExpencesRepository
     {
+        private readonly LoggerAdapter logger;
+
         public DbAppContext Context { get; set; }
-        public ExpencesRepository(DbAppContext dbAppContext) : base(dbAppContext)
+        public ExpencesRepository(DbAppContext dbAppContext, LoggerAdapter logger) : base(dbAppContext)
         {
             Context = dbAppContext;
+            this.logger = new LoggerAdapter(new RepositoryLogger<ExpencesRepository>());
         }
 
-        //TODO: Make it so i dont have to inherite the delete and update methods
+     
         //TODO: see if is even necesary to have a filter Expences by category
 
-        public override void Delete(Domain.Entities.Expences expences)
+        public override void Delete(int id)
         {
-            var ExpenceDeleted = Get(expences.Id);
+            var ExpenceDeleted = Get(id);
             try
             {
-                if (Exits(cd => cd.Id == expences.Id)) return;
+                if (Exits(cd => cd.Id == ExpenceDeleted.Id)) return;
 
                 Context.Expences.Remove(ExpenceDeleted);
                 Context.SaveChanges();
 
             }
-            catch
+            catch (Exception ex) 
             {
+                logger.LogError("Error deleting the new expence" + ex);
                 throw;
             }
         }
@@ -58,12 +64,14 @@ namespace Expences.Infraestrocture.Repositories
             try
             {
                 if (Exits(cd => cd.Id == expenceUpdated.Id)) return;
-
+                expenceUpdated.Description = expences.Description;
+                expenceUpdated.Amount = expences.Amount;
                 Context.Expences.Update(expenceUpdated);
                 Context.SaveChanges();
             }
-            catch
+             catch (Exception ex)
             {
+                logger.LogError("Error Saving the new expence" + ex);
                 throw;
             }
         }
@@ -71,6 +79,11 @@ namespace Expences.Infraestrocture.Repositories
         public List<Domain.Entities.Expences> FilterByCategory(Category category)
         {
             return [.. Context.Expences.Where(cd => cd.CategoryId == category.Id)];
+        }
+
+        public List<Domain.Entities.Expences> GetByUserId(int userId)
+        {
+            return Context.Expences.Include(cd => cd.Category).Where(cd => cd.UserId == userId).ToList();
         }
     }
 }

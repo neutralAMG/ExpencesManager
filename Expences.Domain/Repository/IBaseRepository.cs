@@ -8,6 +8,6 @@ namespace Expences.Domain.Repository
         TEntity Get(int id);
         void Save(TEntity entity);
         void Update(TEntity entity);
-        void Delete(TEntity entity);
+        void Delete(int id);
     }
 }
