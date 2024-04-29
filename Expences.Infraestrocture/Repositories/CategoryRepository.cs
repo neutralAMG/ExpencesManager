@@ -13,24 +13,24 @@ namespace Expences.Infraestrocture.Repositories
 {
     public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
     {
-        private readonly LoggerAdapter logger;
+        // private readonly LoggerAdapter logger;
 
         public DbAppContext Context { get; set; }
         public CategoryRepository(DbAppContext dbAppContext) : base(dbAppContext)
         {
             Context = dbAppContext;
-            this.logger = new LoggerAdapter(new RepositoryLogger<CategoryRepository>());
+         //   this.logger = new LoggerAdapter(new RepositoryLogger<CategoryRepository>());
         }
         public override void Delete(int id)
         {
             var DeleteCategory = Get(id);
             try
             {
-                if (Exits(cd => cd.Id == DeleteCategory.Id)) return;
+                if (Exits(cd => cd.Id != DeleteCategory.Id)) return;
                 Context.Category.Remove(DeleteCategory);
                 Context.SaveChanges();
             }catch (Exception ex){
-                logger.LogError("Error deleting the category" + ex);
+                 //logger.LogError("Error deleting the category" + ex);
                 throw;
             }
         }
@@ -59,14 +59,14 @@ namespace Expences.Infraestrocture.Repositories
             var UpdatedCategory = Get(category.Id);
             try
             {
-                if (Exits(cd => cd.Id == UpdatedCategory.Id)) return;
+                if (Exits(cd => cd.Id != UpdatedCategory.Id)) return;
 
                 UpdatedCategory.Description = category.Description;
                 Context.Category.Update(UpdatedCategory);
                 Context.SaveChanges();
             }
             catch(Exception ex){
-                logger.LogError("Error updating the category" + ex);
+               // logger.LogError("Error updating the category" + ex);
                 throw;
             }
 

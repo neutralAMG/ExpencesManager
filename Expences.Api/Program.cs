@@ -7,15 +7,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add context
 builder.Services.AddDbContext<DbAppContext>(optopns => 
 optopns.UseSqlServer(builder.Configuration.GetConnectionString("DbAppContext")));
 
 //Add Repositories
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IExpencesRepository, ExpencesRepository>();
 
 //Add services
 builder.Services.AddTransient<IUsersService, UsersService>();
+builder.Services.AddTransient<ICategoryService, CategoryService>();
+builder.Services.AddTransient<IExpencesService, ExpencesService>();
+
 
 //Config cor
 builder.Services.AddCors( options =>{

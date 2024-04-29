@@ -8,7 +8,7 @@ namespace Expences.Aplication.Contracts
 {
     public interface IExpencesService : IService<ExpencesGetModel, ExpencesSaveDto, ExpencesUpdateDto>
     {
-       ServiceResult<List<ExpencesGetModel>> FilterByCategory(Category category);
+       ServiceResult<List<ExpencesGetModel>> FilterByCategory(int userId, int id);
         ServiceResult<List<ExpencesGetModel>> GetByUserId(int userId);
     }
 }

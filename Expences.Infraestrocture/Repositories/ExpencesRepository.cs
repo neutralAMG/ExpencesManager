@@ -11,13 +11,15 @@ namespace Expences.Infraestrocture.Repositories
 {
     public class ExpencesRepository : BaseRepository<Domain.Entities.Expences>, IExpencesRepository
     {
-        private readonly LoggerAdapter logger;
+      //  private readonly LoggerAdapter logger;
 
         public DbAppContext Context { get; set; }
-        public ExpencesRepository(DbAppContext dbAppContext, LoggerAdapter logger) : base(dbAppContext)
+        
+        //LoggerAdapter logger
+        public ExpencesRepository(DbAppContext dbAppContext) : base(dbAppContext)
         {
             Context = dbAppContext;
-            this.logger = new LoggerAdapter(new RepositoryLogger<ExpencesRepository>());
+         //   this.logger = new LoggerAdapter(new RepositoryLogger<ExpencesRepository>());
         }
 
      
@@ -28,7 +30,7 @@ namespace Expences.Infraestrocture.Repositories
             var ExpenceDeleted = Get(id);
             try
             {
-                if (Exits(cd => cd.Id == ExpenceDeleted.Id)) return;
+                if (Exits(cd => cd.Id != ExpenceDeleted.Id)) return;
 
                 Context.Expences.Remove(ExpenceDeleted);
                 Context.SaveChanges();
@@ -36,7 +38,7 @@ namespace Expences.Infraestrocture.Repositories
             }
             catch (Exception ex) 
             {
-                logger.LogError("Error deleting the new expence" + ex);
+              //  logger.LogError("Error deleting the new expence" + ex);
                 throw;
             }
         }
@@ -63,7 +65,7 @@ namespace Expences.Infraestrocture.Repositories
             var expenceUpdated = Get(expences.Id);
             try
             {
-                if (Exits(cd => cd.Id == expenceUpdated.Id)) return;
+                if (Exits(cd => cd.Id != expenceUpdated.Id)) return;
                 expenceUpdated.Description = expences.Description;
                 expenceUpdated.Amount = expences.Amount;
                 Context.Expences.Update(expenceUpdated);
@@ -71,14 +73,15 @@ namespace Expences.Infraestrocture.Repositories
             }
              catch (Exception ex)
             {
-                logger.LogError("Error Saving the new expence" + ex);
+               // logger.LogError("Error Saving the new expence" + ex);
                 throw;
             }
         }
 
-        public List<Domain.Entities.Expences> FilterByCategory(Category category)
+        public List<Domain.Entities.Expences> FilterByCategory(int userId, int id)
         {
-            return [.. Context.Expences.Where(cd => cd.CategoryId == category.Id)];
+            var UserExpences = GetByUserId(userId);
+            return [.. UserExpences.Where(cd => cd.CategoryId == id)];
         }
 
         public List<Domain.Entities.Expences> GetByUserId(int userId)

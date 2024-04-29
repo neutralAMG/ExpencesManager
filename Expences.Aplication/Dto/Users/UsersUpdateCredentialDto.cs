@@ -2,7 +2,7 @@
 
 namespace Expences.Aplication.Dto.Users
 {
-    public record UsersUpdateCredentialDto
+    public record UsersUpdateCredentialDto 
     {
         public int Id { get; set; }
         public string UserName { get; set; }
