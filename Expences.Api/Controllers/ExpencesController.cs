@@ -1,5 +1,6 @@
 ﻿using Expences.Aplication.Contracts;
 using Expences.Aplication.Dto.Expences;
+using Expences.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -11,11 +12,14 @@ namespace Expences.Api.Controllers
     public class ExpencesController : ControllerBase
     {
         private readonly IExpencesService expencesService;
+      
 
         public ExpencesController(IExpencesService expencesService)
         {
             this.expencesService = expencesService;
+
         }
+      
         // GET: api/<ExpencesController>
         [HttpGet("GetAllExpences")]
         public IActionResult Get()
@@ -39,10 +43,11 @@ namespace Expences.Api.Controllers
             }
             return Ok(result);
         }
-        [HttpGet("GetByUsuarioId")]
-        public IActionResult GetByUsuario(int id)
+        [HttpGet("GetLoginUserExpences")]
+        public IActionResult GetByUsuario()
         {
-            var result = expencesService.GetByUserId(id);
+            var userId = Convert.ToInt32(HttpContext.Session.GetString(Session.SessionVariable.SessionCurrentUserId));
+            var result = expencesService.GetByUserId(userId);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
@@ -50,8 +55,9 @@ namespace Expences.Api.Controllers
             return Ok(result);
         }
         [HttpGet("GetByCategoryId")]
-        public IActionResult GetByCategory(int userId, int id)
+        public IActionResult GetByCategory(int id)
         {
+           var userId = Convert.ToInt32(HttpContext.Session.GetString(Session.SessionVariable.SessionCurrentUserId));
             var result = expencesService.FilterByCategory(userId, id);
             if (!result.IsSuccess)
             {

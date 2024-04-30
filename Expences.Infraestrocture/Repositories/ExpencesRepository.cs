@@ -2,8 +2,6 @@
 using Expences.Infraestrocture.Context;
 using Expences.Infraestrocture.Core;
 using Expences.Infraestrocture.Interfaces;
-using Expences.Infraestrocture.Logger;
-using Expences.Infraestrocture.Logger.Loggers;
 using Microsoft.EntityFrameworkCore;
 
 

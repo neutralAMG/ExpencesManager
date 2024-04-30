@@ -5,16 +5,19 @@ using Expences.Aplication.Dto.Users;
 using Expences.Aplication.Models;
 using Expences.Domain.Entities;
 using Expences.Infraestrocture.Interfaces;
+using Expences.Infraestrocture.Utils.PasswordHasher;
 
 namespace Expences.Aplication.Services
 {
     public class UsersService : IUsersService
     {
         private readonly IUsersRepository usersRepository;
+        private readonly IPasswordHasher passwordHasher;
 
-        public UsersService(IUsersRepository usersRepository)
+        public UsersService(IUsersRepository usersRepository, IPasswordHasher passwordHasher)
         {
             this.usersRepository = usersRepository;
+            this.passwordHasher = passwordHasher;
         }
 
 
@@ -130,19 +133,29 @@ namespace Expences.Aplication.Services
             return result;
         }
 
-        public ServiceResult<UsersGetModel> GetByPassAndUname(string name, string pass)
+        public ServiceResult<UsersGetModel> LogIn(string name, string pass)
         {
             var result = new ServiceResult<UsersGetModel>();
             try
             {
-                var user = usersRepository.GetByPassAndUname(name, pass);              
                 
+                var user = usersRepository.LogIn(name);                
                 if (user == null)
                 {
                     result.Message = "User not find in db";
                     result.IsSuccess = false;
                     return result;
+                }             
+
+                var ress = passwordHasher.Verification(user.UsuarioPassword, pass);
+
+                if (!ress)
+                {
+                    result.Message = "Incorrect user password introduced";
+                    result.IsSuccess = false;
+                    return result;
                 }
+
                 result.Data = new UsersGetModel
                 {
                     Id = user.Id,
@@ -161,12 +174,12 @@ namespace Expences.Aplication.Services
                             DateIntroduce = cd.DateIntroduce,
                             CategoryId = cd.CategoryId,
                             UserId = cd.UserId,
-                            Category = new CategoryGetModel
-                            {
-                                Id = cd.CategoryId,
-                                Description = cd.Category.Description,
-                                Name = cd.Category.Name,
-                            }
+                            //Category = new CategoryGetModel
+                            //{
+                            //    Id = cd.CategoryId,
+                            //    Description = cd.Category.Description,
+                            //    Name = cd.Category.Name,
+                            //}
 
                         };
 
@@ -190,6 +203,7 @@ namespace Expences.Aplication.Services
         public ServiceResult<UsersGetModel> Save(UsersSaveDto user)
         {
             var result = new ServiceResult<UsersGetModel>();
+            var HashPassword = passwordHasher.HashPassword(user.Password);
             try
             {
                 if (!result.IsSuccess)
@@ -203,7 +217,7 @@ namespace Expences.Aplication.Services
                 {
                     Name = user.Name,
                     LimiteDeGasto = user.LimiteGasto,
-                    UsuarioPassword = user.Password,
+                    UsuarioPassword = HashPassword,
                     UserName = user.UserName,
                     DateCreated = user.DateCreated,
                 });

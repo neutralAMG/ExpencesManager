@@ -1,6 +1,4 @@
-﻿
-
-namespace Expences.Infraestrocture.Logger
+﻿namespace Expences.Infraestrocture.Utils.Logger
 {
     public class LoggerAdapter
     {
@@ -14,7 +12,7 @@ namespace Expences.Infraestrocture.Logger
 
         public void LogCritical(string message)
         {
-           _logger.LogCritical(message);
+            _logger.LogCritical(message);
         }
 
         public void LogError(string message)
@@ -24,8 +22,8 @@ namespace Expences.Infraestrocture.Logger
 
         public void LogInfo(string message)
         {
-           _logger.LogInfo(message);
-           
+            _logger.LogInfo(message);
+
         }
 
         public void LogWarning(string message)

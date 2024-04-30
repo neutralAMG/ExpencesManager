@@ -2,8 +2,6 @@
 using Expences.Infraestrocture.Context;
 using Expences.Infraestrocture.Core;
 using Expences.Infraestrocture.Interfaces;
-using Expences.Infraestrocture.Logger;
-using Expences.Infraestrocture.Logger.Loggers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Expences.Infraestrocture.Repositories
@@ -55,9 +53,10 @@ namespace Expences.Infraestrocture.Repositories
 
         public override void Save(Users user)
         {
+            if(Exits(us => us.Name == user.Name)) return;
             Context.Users.Add(user);
             Context.SaveChanges();
-        }
+        } 
 
         public override void Update(Users user)
         {
@@ -78,10 +77,10 @@ namespace Expences.Infraestrocture.Repositories
             }
         }
 
-        public Users GetByPassAndUname(string name, string pass)
+        public Users LogIn(string name)
         {
 
-            return Context.Users.Include(cd => cd.Expences).FirstOrDefault(cd => cd.UserName == name && cd.UsuarioPassword == pass);
+            return Context.Users.Include(cd => cd.Expences).FirstOrDefault(cd => cd.UserName == name);
            
         }
 

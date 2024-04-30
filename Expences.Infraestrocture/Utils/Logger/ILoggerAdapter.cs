@@ -1,5 +1,4 @@
-﻿
-namespace Expences.Infraestrocture.Logger
+﻿namespace Expences.Infraestrocture.Utils.Logger
 {
     public interface ILoggerAdapter
     {

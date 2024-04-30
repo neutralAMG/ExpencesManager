@@ -44,10 +44,18 @@ namespace Expences.Api.Controllers
         [HttpGet("LogIn")]
         public IActionResult Get(string UserName, string pass)
         {
-            var result = usersService.GetByPassAndUname(UserName, pass);
+            
+            var result = usersService.LogIn(UserName, pass);
             if (!result.IsSuccess)
             {
                 return BadRequest(result);
+            }
+
+            if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString(Session.SessionVariable.SessionCurrentUserId))){
+                HttpContext.Session.SetString(Session.SessionVariable.SessionCurrentUserName, result.Data.Name);
+                HttpContext.Session.SetString(Session.SessionVariable.SessionCurrentUserLimite, Convert.ToString(result.Data.LimiteGasto));
+                HttpContext.Session.SetString(Session.SessionVariable.SessionCurrentUserUserName, result.Data.UserName);
+                HttpContext.Session.SetString(Session.SessionVariable.SessionCurrentUserId, Convert.ToString(result.Data.Id));
             }
             return Ok(result);
         }

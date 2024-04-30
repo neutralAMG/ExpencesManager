@@ -8,7 +8,7 @@ namespace Expences.Aplication.Contracts
 {
     public interface IUsersService : IService<UsersGetModel, UsersSaveDto, UsersUpdateDto>
     {
-        ServiceResult<UsersGetModel> GetByPassAndUname(string name, string pass);
+        ServiceResult<UsersGetModel> LogIn(string name, string pass);
         ServiceResult<UsersGetModel> UpdateCredentials(UsersUpdateCredentialDto user);
     }
 }

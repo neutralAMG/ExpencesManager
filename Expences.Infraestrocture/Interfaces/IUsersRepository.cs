@@ -5,7 +5,7 @@ namespace Expences.Infraestrocture.Interfaces
 {
     public interface IUsersRepository : IBaseRepository<Users>
     {
-        Users GetByPassAndUname(string name, string pass);
+        Users LogIn(string name);
         void UpdateCredentials(Users user);
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Expences.Infraestrocture.Logger.Loggers
+namespace Expences.Infraestrocture.Utils.Logger.Loggers
 {
-    public sealed class AplicationLogger<T> : ILoggerAdapter where T : class
+    public sealed class RepositoryLogger<T> : ILoggerAdapter where T : class
     {
         private readonly ILogger<T> logger;
 
-        //public AplicationLogger(ILogger<T> logger)
+        //public RepositoryLogger(ILogger<T> logger)
         //{
         //    this.logger = logger;
         //}
