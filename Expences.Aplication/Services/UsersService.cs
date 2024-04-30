@@ -6,6 +6,7 @@ using Expences.Aplication.Models;
 using Expences.Domain.Entities;
 using Expences.Infraestrocture.Interfaces;
 using Expences.Infraestrocture.Utils.PasswordHasher;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Expences.Aplication.Services
 {
@@ -27,8 +28,8 @@ namespace Expences.Aplication.Services
             try
             {
                 var user = usersRepository.Get(id);
-                          
-                if (user == null)
+                  
+                if (user is null)
                 {
                     result.Message = "User not find in db";
                     result.IsSuccess = false;
@@ -116,7 +117,7 @@ namespace Expences.Aplication.Services
                     };
                 }).ToList();
 
-                if (result.Data == null)
+                if (result.Data is null)
                 {
                     result.Message = "Error geting the Users";
                     result.IsSuccess = false;
@@ -139,17 +140,18 @@ namespace Expences.Aplication.Services
             try
             {
                 
-                var user = usersRepository.LogIn(name);                
-                if (user == null)
+                var user = usersRepository.LogIn(name);
+                
+                if (user is null)
                 {
                     result.Message = "User not find in db";
                     result.IsSuccess = false;
                     return result;
                 }             
 
-                var ress = passwordHasher.Verification(user.UsuarioPassword, pass);
+                var IsValidPassword = passwordHasher.Verification(user.UsuarioPassword, pass);
 
-                if (!ress)
+                if (!IsValidPassword)
                 {
                     result.Message = "Incorrect user password introduced";
                     result.IsSuccess = false;
@@ -206,10 +208,12 @@ namespace Expences.Aplication.Services
             var HashPassword = passwordHasher.HashPassword(user.Password);
             try
             {
-                if (!result.IsSuccess)
+                var isInValid =  Validate(user);
+
+                if (!isInValid.IsSuccess)
                 {
-                    result.IsSuccess = false;
-                    result.Message = "Error registering the user";
+                    result.IsSuccess = isInValid.IsSuccess;
+                    result.Message = "Error registering the user, " + isInValid.Message;
                     return result;
                 }
 
@@ -238,9 +242,10 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<UsersGetModel>();
             try
             {
-                if (!result.IsSuccess)
+                var isInValid = Validate(user);
+                if (!isInValid.IsSuccess)
                 {
-                    result.Message = "Error updating the user"; 
+                    result.Message = "Error updating the user, " + isInValid.Message; 
                     result.IsSuccess = false;
                     return result;
                 }
@@ -267,6 +272,7 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<UsersGetModel>();
             try
             {
+                
                 if (!result.IsSuccess)
                 {
                     result.Message = "Error updating the user";
@@ -303,6 +309,7 @@ namespace Expences.Aplication.Services
                 }
 
                 usersRepository.Delete(id);
+
                 result.Message = "Succes deleting the user";
 
             }catch (Exception ex) {
@@ -313,9 +320,20 @@ namespace Expences.Aplication.Services
 
             return result;
         }
-        public ServiceResult<UsersGetModel> Validate(BaseDto baseDto)
+        public ServiceResult<UsersGetModel> Validate(UsersBaseDto usersBaseDto)
         {
-            throw new NotImplementedException();
+            var result = new ServiceResult< UsersGetModel>();
+            if (usersBaseDto.Name.IsNullOrEmpty())
+            {
+                result.Message = "Name can not be Empty";
+                result.IsSuccess = false;
+            }
+            if (usersBaseDto.LimiteGasto == 0 || usersBaseDto.LimiteGasto < 0)
+            {
+                result.Message = "Limite de pago cant be less or 0";
+                result.IsSuccess = false;
+            }
+            return result;
         }
     }
 }

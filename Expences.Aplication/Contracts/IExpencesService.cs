@@ -1,6 +1,7 @@
 ﻿
 using Expences.Aplication.Core;
 using Expences.Aplication.Dto.Expences;
+using Expences.Aplication.Dto.Users;
 using Expences.Aplication.Models;
 using Expences.Domain.Entities;
 
@@ -10,5 +11,6 @@ namespace Expences.Aplication.Contracts
     {
        ServiceResult<List<ExpencesGetModel>> FilterByCategory(int userId, int id);
         ServiceResult<List<ExpencesGetModel>> GetByUserId(int userId);
+        ServiceResult<ExpencesGetModel> Validate(ExpencesBaseDto usersBaseDto);
     }
 }

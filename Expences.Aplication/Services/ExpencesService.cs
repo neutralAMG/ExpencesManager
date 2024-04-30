@@ -3,9 +3,8 @@ using Expences.Aplication.Contracts;
 using Expences.Aplication.Core;
 using Expences.Aplication.Dto.Expences;
 using Expences.Aplication.Models;
-using Expences.Domain.Entities;
 using Expences.Infraestrocture.Interfaces;
-using Expences.Domain;
+using Microsoft.IdentityModel.Tokens;
 namespace Expences.Aplication.Services
 {
     public class ExpencesService : IExpencesService
@@ -43,7 +42,7 @@ namespace Expences.Aplication.Services
                 }
                 ).ToList();
 
-                if (result.Data == null)
+                if (result.Data is null)
                 {
                     result.Message = "Error geting the expences";
                     result.IsSuccess = false;
@@ -65,10 +64,9 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<ExpencesGetModel>();
             try
             {
-
                 var expences = expencesRepository.Get(id);
 
-                if (result.Data == null)
+                if (expences is null)
                 {
                     result.Message = "Error geting the expences";
                     result.IsSuccess = false;
@@ -109,9 +107,6 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<List<ExpencesGetModel>>();
             try
             {
-
-
-
                 result.Data = expencesRepository.Get().Select(expe =>
                 new ExpencesGetModel
                 {
@@ -131,7 +126,7 @@ namespace Expences.Aplication.Services
                 }
                 ).ToList();
 
-                if (result.Data == null)
+                if (result.Data is null)
                 {
                     result.Message = "Error geting the expences";
                     result.IsSuccess = false;
@@ -173,12 +168,14 @@ namespace Expences.Aplication.Services
                     }
                 }
                   ).ToList();
-                if (result.Data == null)
+
+                if (result.Data is null)
                 {
                     result.Message = "Error geting the expences";
                     result.IsSuccess = false;
                     return result;
                 }
+
                 result.Message = "Succes geting the expence";
 
             }
@@ -196,11 +193,11 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<ExpencesGetModel>();
             try
             {
-
-                if (!result.IsSuccess)
+                var isInValid = Validate(expence);
+                if (!isInValid.IsSuccess)
                 {
-                    result.Message = "Error saving the expence";
-                    result.IsSuccess = false;
+                    result.Message = "Error saving the expence, " + isInValid.Message;
+                    result.IsSuccess = isInValid.IsSuccess;
                     return result;
                 }
 
@@ -230,10 +227,11 @@ namespace Expences.Aplication.Services
             var result = new ServiceResult<ExpencesGetModel>();
             try
             {
-                if (!result.IsSuccess)
+                var isInValid = Validate(expence);
+                if (!isInValid.IsSuccess)
                 {
-                    result.Message = "Error updating the expence";
-                    result.IsSuccess = false;
+                    result.Message = "Error updating the expence, " + isInValid.Message;
+                    result.IsSuccess = isInValid.IsSuccess;
                     return result;
                 }
 
@@ -278,10 +276,32 @@ namespace Expences.Aplication.Services
 
             return result;
         }
-
-        public ServiceResult<ExpencesGetModel> Validate(BaseDto baseDto)
+        public ServiceResult<ExpencesGetModel> Validate(ExpencesBaseDto expencesBaseDto)
         {
-            throw new NotImplementedException();
+            var result = new ServiceResult<ExpencesGetModel>();
+            if (expencesBaseDto.Name.IsNullOrEmpty())
+            {
+                result.Message = "Name can not be Empty";
+                result.IsSuccess = false;
+            }
+            if (expencesBaseDto.Description.IsNullOrEmpty())
+            {
+                result.Message = "The description can not be Empty";
+                result.IsSuccess = false;
+            }
+            if (expencesBaseDto.Description.Length > 50)
+            {
+                result.Message = "The description can not have less than 50 caracters";
+                result.IsSuccess = false;
+            }
+
+            if (expencesBaseDto.Amount == 0 || expencesBaseDto.Amount < 0)
+            {
+                result.Message = "Amount cant be less or 0";
+                result.IsSuccess = false;
+            }
+
+            return result;
         }
     }
 }

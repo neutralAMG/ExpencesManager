@@ -10,5 +10,6 @@ namespace Expences.Aplication.Contracts
     {
         ServiceResult<UsersGetModel> LogIn(string name, string pass);
         ServiceResult<UsersGetModel> UpdateCredentials(UsersUpdateCredentialDto user);
+        ServiceResult<UsersGetModel> Validate(UsersBaseDto usersBaseDto);
     }
 }

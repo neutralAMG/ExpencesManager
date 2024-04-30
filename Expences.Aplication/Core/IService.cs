@@ -11,6 +11,5 @@ namespace Expences.Aplication.Core
         ServiceResult<TModel> Save(TSave entity);
         ServiceResult<TModel> Update(TUpdate entity);
         ServiceResult<TModel> Delete(int id);
-        ServiceResult<TModel> Validate(BaseDto baseDto);
     }
 }
